@@ -10,10 +10,10 @@ pygame.init()
 pygame.mixer.init()
 
 screen=pygame.display.set_mode((640,480))
-pygame.display.set_caption("Carson's Game")
+pygame.display.set_caption("MailRun Game")
 font = pygame.font.Font('font\Gameplay.ttf', 20)
 def menu():
-    image=pygame.image.load('assets\menu.png')
+    image=pygame.image.load('assets\home.png')
     image=pygame.transform.scale(image,(640,480))
     while True:
         screen.blit(image,(0,0))
@@ -23,7 +23,7 @@ def menu():
                 pygame.display.quit()
                 exit()
             if event.type ==pygame.MOUSEBUTTONDOWN:
-                if event.pos[0] in range(316,337) and event.pos[1] in range(171,205):
+                if event.pos[0] in range(210,275) and event.pos[1] in range(182,250):#x1,x2 y1,y2
                     game()
 
 

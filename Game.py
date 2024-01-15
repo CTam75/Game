@@ -47,6 +47,7 @@ def game():
     bee_x= 700
     score_value = 0
     jump_limit=0
+    tolerance=10
 
 
     while True:
@@ -71,7 +72,7 @@ def game():
         if jump == 1 and jump_limit<3:
             player_y = player_y-4
             jump_count+=1
-            print(jump_limit)
+            #print(jump_limit)
         if jump_count > 40:
             jump_count = 0
             jump = 0
@@ -93,9 +94,19 @@ def game():
         if crate_x<-50:
             crate_x = random.randint(700,820)
 
-            score_value+=1
+        #    score_value+=1
+        if p_rect.colliderect(c_rect):  #This section allows player to jump on top of the crate, and jump off of it.
+ #           print(c_rect)
+            if abs(c_rect.top - p_rect.bottom) < tolerance:
+                gravity=0
+                jump_count=0
+                p_rect.bottom = 330
+            if jump==1:
+                gravity=1
 
-        if b_rect.colliderect(p_rect) or c_rect.colliderect(p_rect):
+
+
+        if b_rect.colliderect(p_rect):
             return
 
 

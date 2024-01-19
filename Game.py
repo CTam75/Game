@@ -12,6 +12,8 @@ pygame.mixer.init()
 screen=pygame.display.set_mode((640,480))
 pygame.display.set_caption("MailRun Game")
 font = pygame.font.Font('font\Gameplay.ttf', 20)
+pygame.mixer.music.load('assets\\running.mp3')
+pygame.mixer.music.play()
 def menu():
     image=pygame.image.load('assets\home.png')
     image=pygame.transform.scale(image,(640,480))

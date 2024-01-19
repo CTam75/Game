@@ -55,18 +55,25 @@ def game():
         screen.blit(image, (bgx, 0))
         screen.blit(image, (bgx+640, 0))
 #        bgx=bgx-1
-
+        b_rect = screen.blit(bee, (bee_x, 330))
+        c_rect = screen.blit(crate, (crate_x, 330))
+        p_rect = screen.blit(player, (50, player_y))
         if bgx <= -640:
            bgx=0
         keypressed = pygame.key.get_pressed()
         if keypressed[pygame.K_RIGHT]:
-            bgx = bgx - 1
-            crate_x= crate_x -1
+
+            if p_rect.colliderect(c_rect)==0 or player_y<280:#checks for collision between player and crate, if there is, then no movement, if player jumps so there is no collision, then continue to allow movement.
+
+                bgx = bgx - 1
+                crate_x= crate_x -1
+
+
         if keypressed[pygame.K_LEFT]:
             bgx = bgx + 1
             crate_x=crate_x +1
 
-        p_rect=screen.blit(player, (50, player_y))
+
         if player_y < 280:
             player_y += gravity
         if jump == 1 and jump_limit<3:
@@ -82,8 +89,7 @@ def game():
 
 
 
-        b_rect=screen.blit(bee, (bee_x, 330))
-        c_rect=screen.blit(crate,(crate_x,330))
+
 #        crate_x= random.randint(300, 640)
         bee_x -= bee_speed
         if bee_x<-50:
@@ -103,6 +109,9 @@ def game():
                 p_rect.bottom = 330
             if jump==1:
                 gravity=1
+#        if p_rect.colliderect(c_rect):
+#            if abs(c_rect.left - p_rect.right) < tolerance:
+ #               bgx = 0
 
 
 

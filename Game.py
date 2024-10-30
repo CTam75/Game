@@ -13,7 +13,7 @@ screen=pygame.display.set_mode((640,480))
 pygame.display.set_caption("MailRun Game")
 font = pygame.font.Font('font\Gameplay.ttf', 20)
 pygame.mixer.music.load('assets\\running.mp3')
-pygame.mixer.music.play()
+pygame.mixer.music.play()   #tells the program to play the music once it loads
 def menu():
     image=pygame.image.load('assets\home.png')
     image=pygame.transform.scale(image,(640,480))
@@ -56,7 +56,7 @@ def game():
         screen.blit(image, (bgx-640, 0)) #these 3 lines makes the screen scroll
         screen.blit(image, (bgx, 0))
         screen.blit(image, (bgx+640, 0))
-#        bgx=bgx-1
+#        bgx=bgx-1 #this makes it auto scroll, which I disable so that you use arrow keys to scroll left or right.
         b_rect = screen.blit(bee, (bee_x, 330))
         c_rect = screen.blit(crate, (crate_x, 330))
         p_rect = screen.blit(player, (50, player_y))
@@ -67,12 +67,12 @@ def game():
 
             if p_rect.colliderect(c_rect)==0 or player_y<280:#checks for collision between player and crate, if there is, then no movement, if player jumps so there is no collision, then continue to allow movement.
 
-                bgx = bgx - 1
+                bgx = bgx - 1 #This scrolls the screen right by subtracting it's X location value by 1
                 crate_x= crate_x -1
 
 
         if keypressed[pygame.K_LEFT]:
-            bgx = bgx + 1
+            bgx = bgx + 1  #this scrolls the screen left by adding 1 to the x location value
             crate_x=crate_x +1
 
 
@@ -82,7 +82,7 @@ def game():
             player_y = player_y-4
             jump_count+=1
             #print(jump_limit)
-        if jump_count > 40:
+        if jump_count > 40: #tese set of code prevents unlimited jumps in the air
             jump_count = 0
             jump = 0
         if player_y==280: #When player reaches ground, it resets jump limit to allow jumps again.

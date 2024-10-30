@@ -109,6 +109,9 @@ def game():
                 gravity=0
                 jump_count=0
                 p_rect.bottom = 330
+            else:
+                    gravity = 1
+                    jump = 1
             if jump==1:
                 gravity=1
 #        if p_rect.colliderect(c_rect):
@@ -117,7 +120,7 @@ def game():
 
 
 
-        if b_rect.colliderect(p_rect):
+        if b_rect.colliderect(p_rect):  # when the Bee collides with the player the game ends and 'return' to menu
             return
 
 

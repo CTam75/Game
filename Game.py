@@ -105,7 +105,7 @@ def game():
 
         #    score_value+=1
         if p_rect.colliderect(c_rect):  #This section allows player to jump on top of the crate, and jump off of it.
- #           if not collision:
+
             if abs(c_rect.top - p_rect.bottom) < tolerance:
                 gravity=0
                 jump_count=0

@@ -50,6 +50,7 @@ def game():
     score_value = 0
     jump_limit=0
     tolerance=10
+    collision = False
 
 
     while True:
@@ -104,19 +105,14 @@ def game():
 
         #    score_value+=1
         if p_rect.colliderect(c_rect):  #This section allows player to jump on top of the crate, and jump off of it.
- #           print(c_rect)
+ #           if not collision:
             if abs(c_rect.top - p_rect.bottom) < tolerance:
                 gravity=0
                 jump_count=0
                 p_rect.bottom = 330
-            else:
-                    gravity = 1
-                    jump = 1
-            if jump==1:
-                gravity=1
-#        if p_rect.colliderect(c_rect):
-#            if abs(c_rect.left - p_rect.right) < tolerance:
- #               bgx = 0
+                if jump==1 or keypressed[pygame.K_LEFT] or keypressed[pygame.K_RIGHT]:
+                    gravity=1
+                    bgx = 0
 
 
 

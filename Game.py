@@ -6,181 +6,169 @@
 #BRIANNA'S TEST
 import pygame
 import random
+
 pygame.init()
 pygame.mixer.init()
 
-screen=pygame.display.set_mode((640,480))
+screen = pygame.display.set_mode((640, 480))
 pygame.display.set_caption("MailRun Game")
-font = pygame.font.Font('font\Gameplay.ttf', 20)
-pygame.mixer.music.load('assets\\running.mp3')
-pygame.mixer.music.play()   #tells the program to play the music once it loads
+font = pygame.font.Font('font/Gameplay.ttf', 20)  # Fixed path
+pygame.mixer.music.load('assets/running.mp3')  # Fixed path
+pygame.mixer.music.play(-1)
+
 def menu():
-    image=pygame.image.load('assets\home.png')
-    image=pygame.transform.scale(image,(640,480))
+    image = pygame.image.load('assets/home.png')  # Fixed path
+    image = pygame.transform.scale(image, (640, 480))
     while True:
-        screen.blit(image,(0,0))
+        screen.blit(image, (0, 0))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.display.quit()
+                pygame.quit()
                 exit()
-            if event.type ==pygame.MOUSEBUTTONDOWN:
-                if event.pos[0] in range(210,275) and event.pos[1] in range(182,250):#x1,x2 y1,y2
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if 210 <= event.pos[0] <= 275 and 182 <= event.pos[1] <= 250:
                     game()
 
 
 
 def game():
-    image = pygame.image.load('assets\level1.png')
+    image = pygame.image.load('assets/level1.png')  # Fixed path
     image = pygame.transform.scale(image, (640, 480))
     bgx = 0
-    player = pygame.image.load('assets\character.png')
-    player =pygame.transform.rotozoom(player,0,0.3)
-    player_y= 280
+    player = pygame.image.load('assets/character.png')  # Fixed path
+    player = pygame.transform.rotozoom(player, 0, 0.3)
+    player_y = 280
     gravity = 1
     jump_count = 0
-    jump =0
-    jumpsound = pygame.mixer.Sound('assets\jump.mp3')
-    bee = pygame.image.load('assets\\bee.png')
-    bee = pygame.transform.rotozoom(bee,0,0.3)
-    crate = pygame.image.load('assets\crate.png')
-    crate = pygame.transform.rotozoom(crate,0,0.3)
-    crate_x= 700
-    bee_speed=2
-    bee_x= 700
+    jump = 0
+    jumpsound = pygame.mixer.Sound('assets/jump.mp3')  # Fixed path
+    bee = pygame.image.load('assets/bee.png')  # Fixed path
+    bee = pygame.transform.rotozoom(bee, 0, 0.3)
+    crate = pygame.image.load('assets/crate.png')  # Fixed path
+    crate = pygame.transform.rotozoom(crate, 0, 0.3)
+    crate_x = 700
+    bee_speed = 3
+    bee_x = 700
     score_value = 0
-    jump_limit=0
-    tolerance=10
+    jump_limit = 0
+    tolerance = 10
     collision = False
-    envelope = pygame.image.load('assets\envelope.png')
-    envelope = pygame.transform.rotozoom(envelope, 0, 0.3)
+    envelopesound =  pygame.mixer.Sound('assets/paper.wav')
+
+    # Envelope setup
+    envelope = pygame.image.load('assets/envelope.png').convert_alpha()  # Fixed path
+    envelope = pygame.transform.rotozoom(envelope, 0, 0.1)
+    envelope_rect = envelope.get_rect()
+    envelope_width = envelope_rect.width
+    envelope_height = envelope_rect.height
+    Spawn_Image_Event = pygame.USEREVENT + 1
+    pygame.time.set_timer(Spawn_Image_Event, 10000)
+    envelope_positions = []
+
+    clock = pygame.time.Clock()  # Moved outside loop
 
     while True:
-        screen.blit(image, (bgx-640, 0)) #these 3 lines makes the screen scroll
+        # Handle events first
+        def get_random_position(envelope_width, envelope_height):  # Moved outside, with params for clarity
+            return (random.randint(0, 640 - envelope_width), random.randint(0, 280 - envelope_height))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    jump = 1
+                    jump_limit += 1
+                    jumpsound.play()
+            if event.type == Spawn_Image_Event:
+                new_rect = envelope.get_rect(topleft=get_random_position(envelope_width, envelope_height))
+                envelope_positions.append(new_rect)
+
+        # Clear screen (optional, but prevents artifacts)
+        screen.fill((0, 0, 0))
+
+        # Draw background
+        screen.blit(image, (bgx - 640, 0))
         screen.blit(image, (bgx, 0))
-        screen.blit(image, (bgx+640, 0))
-#        bgx=bgx-1 #this makes it auto scroll, which I disable so that you use arrow keys to scroll left or right.
+        screen.blit(image, (bgx + 640, 0))
+
+        # Draw objects
         b_rect = screen.blit(bee, (bee_x, 330))
         c_rect = screen.blit(crate, (crate_x, 330))
         p_rect = screen.blit(player, (50, player_y))
+
+        # Background wrap
         if bgx <= -640:
-           bgx=0
+            bgx = 0
+
+        # Input handling
         keypressed = pygame.key.get_pressed()
         if keypressed[pygame.K_RIGHT]:
-
-            if p_rect.colliderect(c_rect)==0 or player_y<280:#checks for collision between player and crate, if there is, then no movement, if player jumps so there is no collision, then continue to allow movement.
-
-                bgx = bgx - 1 #This scrolls the screen right by subtracting it's X location value by 1
-                crate_x= crate_x -1
-
-
+            if p_rect.colliderect(c_rect) == 0 or player_y < 280:
+                bgx -= 2
+                crate_x -= 2
         if keypressed[pygame.K_LEFT]:
-            bgx = bgx + 1  #this scrolls the screen left by adding 1 to the x location value
-            crate_x=crate_x +1
+            bgx += 2
+            crate_x += 2
 
-
+        # Player physics
         if player_y < 280:
             player_y += gravity
-        if jump == 1 and jump_limit<3:
-            player_y = player_y-4
-            jump_count+=1
-            #print(jump_limit)
-        if jump_count > 40: #these set of code prevents unlimited jumps in the air
+        if jump == 1 and jump_limit < 3:
+            player_y -= 4
+            jump_count += 1
+        if jump_count > 40:
             jump_count = 0
             jump = 0
-        if player_y==280: #When player reaches ground, it resets jump limit to allow jumps again.
-            jump_limit=0
+        if player_y == 280:
+            jump_limit = 0
 
-
-
-
-
-
-#        crate_x= random.randint(300, 640)
+        # Bee and crate movement
         bee_x -= bee_speed
-        if bee_x<-50:
-#            crate_x=700
-            bee_x = random.randint(700,820)
-            bee_speed = random.randint(2,4)
-            score_value+=1
-        if crate_x<-50:
-            crate_x = random.randint(700,820)
+        if bee_x < -50:
+            bee_x = random.randint(700, 820)
+            bee_speed = random.randint(3, 5)
+         #   score_value += 1
+        if crate_x < -50:
+            crate_x = random.randint(700, 820)
 
-        #    score_value+=1
-        if p_rect.colliderect(c_rect):  #This section allows player to jump on top of the crate, and jump off of it.
-
+        # Crate collision
+        if p_rect.colliderect(c_rect):
             if abs(c_rect.top - p_rect.bottom) < tolerance:
-                gravity=0
-                jump_count=0
+                gravity = 0
+                jump_count = 0
                 p_rect.bottom = 330
-                if jump==1 or keypressed[pygame.K_LEFT] or keypressed[pygame.K_RIGHT]:
-                    gravity=1
-                    bgx = 0
+                if jump == 1 or keypressed[pygame.K_LEFT] or keypressed[pygame.K_RIGHT]:
+                    gravity = 1
+                    bgx = 0  # Verify if intended
 
+        # Bee collision (game over)
+        if b_rect.colliderect(p_rect):
+            # Optional: Show game over screen
+            screen.fill((0, 0, 0))
+            go_text = font.render('Game Over! Score: ' + str(score_value), True, (255, 0, 0))
+            screen.blit(go_text, (screen.get_width() // 2 - 150, screen.get_height() // 2))
+            pygame.display.update()
+            pygame.time.wait(2000)
+            return  # Now properly inside function
 
+        # Envelope collisions (new: for scoring)
+        for pos in envelope_positions[:]:
+            screen.blit(envelope, (pos.x + bgx, pos.y))  # Offset x by bgx
+            env_rect = envelope.get_rect(topleft=(pos.x + bgx, pos.y))
+            if p_rect.colliderect(env_rect):
+                envelopesound.play()
+                envelope_positions.remove(pos)
+                score_value += 1
 
-        if b_rect.colliderect(p_rect):  # when the Bee collides with the player the game ends and 'return' to menu
-            return
-
-
-        text = font.render('Score: ' + str(score_value), True, 'white')
-        screen.blit(text, (30,30))
-
-#        else:
-#            return
-
-
-
-#        if c_rect.colliderect(p_rect):
- #          return
+        # Draw score
+        text = font.render('Score: ' + str(score_value), True, (255, 255, 255))
+        screen.blit(text, (30, 30))
 
         pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.display.quit()
-                exit()
-#            keypressed = pygame.key.get_pressed()
-#            if keypressed[pygame.K_RIGHT]:
-#                bgx = bgx - 20
-#            if keypressed[pygame.K_LEFT]:
-#                bgx = bgx + 20
-            if event.type == pygame.KEYDOWN:
-                if event.key==pygame.K_SPACE:
-#                    print("jump")
-                    jump =1
-                    jump_limit+=1 # allows only double jump
-                    pygame.mixer.Sound.play(jumpsound)
+        clock.tick(60)  # Limit to 60 FPS
 
-#The following is to generate a random object that the player can collect
-
-envelope_rect = envelope.get_rect()
-envelope_width = envelope_rect.width
-envelope_height = envelope_rect.height
-
-def get_random_position():
-    x = random.randint(0, 640 - envelope_width)
-    y = random.randint(0, 480 - envelope_height)
-    return x,y
-
-envelope_positions = []
-
-Spawn_Image_Event = pygame.USEREVENT+1
-pygame.time.set_timer(Spawn_Image_Event, 10000)
-for event in pygame.event.get():
-    if event.type == Spawn_Image_Event:
-        new_rect = envelope.get_rect(topleft=get_random_position)
-        envelope_positions.append(new_rect)
-for pos in envelope_positions:
-    screen.blit(envelope, pos)
-
-
-
- #                   score_value+=1
-
-#            font = pygame.font.Font('freesansbold.tff', 30)
-#            text = font.render('Score: ' + str(score_value), True, 'white')
-#            screen.blit(text, (700,30))
-
+# Start the game
 menu()
-
 

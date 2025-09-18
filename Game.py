@@ -29,6 +29,7 @@ def menu():
                     game()
 
 
+
 def game():
     image = pygame.image.load('assets\level1.png')
     image = pygame.transform.scale(image, (640, 480))
@@ -51,7 +52,8 @@ def game():
     jump_limit=0
     tolerance=10
     collision = False
-
+    envelope = pygame.image.load('assets\envelope.png')
+    envelope = pygame.transform.rotozoom(envelope, 0, 0.3)
 
     while True:
         screen.blit(image, (bgx-640, 0)) #these 3 lines makes the screen scroll
@@ -83,11 +85,12 @@ def game():
             player_y = player_y-4
             jump_count+=1
             #print(jump_limit)
-        if jump_count > 40: #tese set of code prevents unlimited jumps in the air
+        if jump_count > 40: #these set of code prevents unlimited jumps in the air
             jump_count = 0
             jump = 0
         if player_y==280: #When player reaches ground, it resets jump limit to allow jumps again.
             jump_limit=0
+
 
 
 
@@ -147,6 +150,28 @@ def game():
                     jump =1
                     jump_limit+=1 # allows only double jump
                     pygame.mixer.Sound.play(jumpsound)
+
+#The following is to generate a random object that the player can collect
+
+envelope_rect = envelope.get_rect()
+envelope_width = envelope_rect.width
+envelope_height = envelope_rect.height
+
+def get_random_position():
+    x = random.randint(0, 640 - envelope_width)
+    y = random.randint(0, 480 - envelope_height)
+    return x,y
+
+envelope_positions = []
+
+Spawn_Image_Event = pygame.USEREVENT+1
+pygame.time.set_timer(Spawn_Image_Event, 10000)
+for event in pygame.event.get():
+    if event.type == Spawn_Image_Event:
+        new_rect = envelope.get_rect(topleft=get_random_position)
+        envelope_positions.append(new_rect)
+for pos in envelope_positions:
+    screen.blit(envelope, pos)
 
 
 

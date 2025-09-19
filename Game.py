@@ -48,7 +48,7 @@ def game():
     crate = pygame.image.load('assets/crate.png')  # Fixed path
     crate = pygame.transform.rotozoom(crate, 0, 0.3)
     crate_x = 700
-    bee_speed = 3
+    bee_speed = 2
     bee_x = 700
     score_value = 0
     jump_limit = 0
@@ -58,7 +58,7 @@ def game():
 
     # Envelope setup
     envelope = pygame.image.load('assets/envelope.png').convert_alpha()  # Fixed path
-    envelope = pygame.transform.rotozoom(envelope, 0, 0.1)
+    envelope = pygame.transform.rotozoom(envelope, 0, 0.06)
     envelope_rect = envelope.get_rect()
     envelope_width = envelope_rect.width
     envelope_height = envelope_rect.height
@@ -71,16 +71,17 @@ def game():
     while True:
         # Handle events first
         def get_random_position(envelope_width, envelope_height):  # Moved outside, with params for clarity
-            return (random.randint(0, 640 - envelope_width), random.randint(0, 280 - envelope_height))
+            return (random.randint(0, 640 - envelope_width), random.randint(40, 280 - envelope_height))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    jump = 1
-                    jump_limit += 1
-                    jumpsound.play()
+                    if (jump_limit == 0 and (player_y >= 280 or gravity == 0)) or (jump_limit == 1 and gravity == 1):
+                        jump = 1
+                        jump_limit += 1
+                        jumpsound.play()
             if event.type == Spawn_Image_Event:
                 new_rect = envelope.get_rect(topleft=get_random_position(envelope_width, envelope_height))
                 envelope_positions.append(new_rect)
@@ -106,11 +107,11 @@ def game():
         keypressed = pygame.key.get_pressed()
         if keypressed[pygame.K_RIGHT]:
             if p_rect.colliderect(c_rect) == 0 or player_y < 280:
-                bgx -= 2
-                crate_x -= 2
+                bgx -= 1
+                crate_x -= 1
         if keypressed[pygame.K_LEFT]:
-            bgx += 2
-            crate_x += 2
+            bgx += 1
+            crate_x += 1
 
         # Player physics
         if player_y < 280:
@@ -128,20 +129,30 @@ def game():
         bee_x -= bee_speed
         if bee_x < -50:
             bee_x = random.randint(700, 820)
-            bee_speed = random.randint(3, 5)
+            bee_speed = random.randint(3, 6)
          #   score_value += 1
         if crate_x < -50:
             crate_x = random.randint(700, 820)
 
         # Crate collision
+        side_collision = p_rect.colliderect(c_rect) and abs(c_rect.top - p_rect.bottom) >= tolerance
+        if keypressed[pygame.K_RIGHT]:
+            if not side_collision:  # Only move if not hitting crate side
+                bgx -= 1
+                crate_x -= 1
+        if keypressed[pygame.K_LEFT]:
+            bgx += 1
+            crate_x += 1
         if p_rect.colliderect(c_rect):
             if abs(c_rect.top - p_rect.bottom) < tolerance:
                 gravity = 0
                 jump_count = 0
-                p_rect.bottom = 330
-                if jump == 1 or keypressed[pygame.K_LEFT] or keypressed[pygame.K_RIGHT]:
-                    gravity = 1
-                    bgx = 0  # Verify if intended
+                jump_limit = 0
+                jump = 0
+                p_rect.bottom=330
+                # Check if player is still on crate
+        if jump==1 or gravity == 0 and (p_rect.right <= c_rect.left or p_rect.left >= c_rect.right):
+            gravity = 1  # Fall off if beyond crate edges
 
         # Bee collision (game over)
         if b_rect.colliderect(p_rect):
@@ -151,7 +162,7 @@ def game():
             screen.blit(go_text, (screen.get_width() // 2 - 150, screen.get_height() // 2))
             pygame.display.update()
             pygame.time.wait(2000)
-            return  # Now properly inside function
+            return(menu())  # Now properly inside function
 
         # Envelope collisions (new: for scoring)
         for pos in envelope_positions[:]:
@@ -167,7 +178,7 @@ def game():
         screen.blit(text, (30, 30))
 
         pygame.display.update()
-        clock.tick(60)  # Limit to 60 FPS
+        clock.tick(120)  # Limit to 60 FPS
 
 # Start the game
 menu()

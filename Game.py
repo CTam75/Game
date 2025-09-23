@@ -78,7 +78,7 @@ def game():
                 exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if (jump_limit == 0 and (player_y >= 280 or gravity == 0)) or (jump_limit == 1 and gravity == 1):
+                    if (jump_limit == 0 and (player_y >= 280 or gravity == 0)) or (jump_limit == 1 and gravity == 1) or p_rect.bottom==c_rect.top:
                         jump = 1
                         jump_limit += 1
                         jumpsound.play()
@@ -122,7 +122,7 @@ def game():
         if jump_count > 40:
             jump_count = 0
             jump = 0
-        if player_y == 280:
+        if player_y >= 280 or p_rect.bottom==c_rect.top:
             jump_limit = 0
 
         # Bee and crate movement
@@ -146,13 +146,15 @@ def game():
         if p_rect.colliderect(c_rect):
             if abs(c_rect.top - p_rect.bottom) < tolerance:
                 gravity = 0
-                jump_count = 0
-                jump_limit = 0
-                jump = 0
-                p_rect.bottom=330
+#                jump_count = 0
+#                jump_limit = 0
+#                jump = 0
+                p_rect.bottom=c_rect.top
+
                 # Check if player is still on crate
         if jump==1 or gravity == 0 and (p_rect.right <= c_rect.left or p_rect.left >= c_rect.right):
-            gravity = 1  # Fall off if beyond crate edges
+           gravity = 1  # Fall off if beyond crate edges
+
 
         # Bee collision (game over)
         if b_rect.colliderect(p_rect):
@@ -182,4 +184,3 @@ def game():
 
 # Start the game
 menu()
-

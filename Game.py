@@ -48,7 +48,7 @@ def game():
     crate = pygame.image.load('assets/crate.png')  # Fixed path
     crate = pygame.transform.rotozoom(crate, 0, 0.3)
     crate_x = 700
-    bee_speed = 2
+    bee_speed = 1
     bee_x = 700
     score_value = 0
     jump_limit = 0
@@ -95,7 +95,8 @@ def game():
         screen.blit(image, (bgx + 640, 0))
 
         # Draw objects
-        b_rect = screen.blit(bee, (bee_x, 330))
+        b_rect = screen.blit(bee, (bee_x + bgx, 330))
+#        b_rect = screen.blit(bee, (bee_x, 330))
         c_rect = screen.blit(crate, (crate_x, 330))
         p_rect = screen.blit(player, (50, player_y))
 
@@ -127,9 +128,9 @@ def game():
 
         # Bee and crate movement
         bee_x -= bee_speed
-        if bee_x < -50:
-            bee_x = random.randint(700, 820)
-            bee_speed = random.randint(3, 6)
+        if bee_x < -50 -bgx:
+            bee_x = 640 - bgx
+            bee_speed = random.randint(2, 5)
          #   score_value += 1
         if crate_x < -50:
             crate_x = random.randint(700, 820)

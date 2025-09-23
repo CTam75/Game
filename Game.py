@@ -128,7 +128,7 @@ def game():
 
         # Bee and crate movement
         bee_x -= bee_speed
-        if bee_x < -50 -bgx:
+        if bee_x + bgx < -100:
             bee_x = 640 - bgx
             bee_speed = random.randint(2, 5)
          #   score_value += 1
